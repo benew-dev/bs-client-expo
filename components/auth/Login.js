@@ -13,7 +13,7 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { validateLogin } from "../../helpers/validation/schemas/auth";
 import { captureClientError } from "../../lib/monitoring";
-import { signIn } from "../../lib/auth-client";
+import { authClient, signIn } from "../../lib/auth-client";
 import { showToast } from "../../lib/toast";
 
 // N'accepte que les chemins internes de l'app (équivalent minimal de parseCallbackUrl)
@@ -67,6 +67,19 @@ const Login = () => {
       }
 
       if (data) {
+        // Bug connu de Better Auth sur Expo (issues #3711, #1006, #8420) :
+        // useSession() ne se met pas toujours à jour tout seul après signIn.
+        // On force un refetch explicite pour que le Header (et le panier)
+        // voient l'utilisateur connecté sans attendre
+        const cookies = await authClient.getCookie();
+        console.log("COOKIE APRÈS LOGIN:", cookies);
+
+        try {
+          await authClient.getSession({ query: { disableCookieCache: true } });
+        } catch (refreshError) {
+          console.error("Session refresh error:", refreshError.message);
+        }
+
         showToast("Connexion réussie!");
         router.replace(callbackUrl);
       }

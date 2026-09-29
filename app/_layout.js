@@ -10,6 +10,8 @@ import { CartProvider } from "../context/CartContext";
 import Header from "../components/layouts/Header";
 
 export default function RootLayout() {
+  console.log("getSetCookie support:", typeof new Headers().getSetCookie);
+
   return (
     <SafeAreaProvider>
       <CartProvider>
