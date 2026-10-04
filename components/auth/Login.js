@@ -71,9 +71,6 @@ const Login = () => {
         // useSession() ne se met pas toujours à jour tout seul après signIn.
         // On force un refetch explicite pour que le Header (et le panier)
         // voient l'utilisateur connecté sans attendre
-        const cookies = await authClient.getCookie();
-        console.log("COOKIE APRÈS LOGIN:", cookies);
-
         try {
           await authClient.getSession({ query: { disableCookieCache: true } });
         } catch (refreshError) {
